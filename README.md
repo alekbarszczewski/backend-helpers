@@ -22,7 +22,6 @@ import { loadStore, loadGraphql, createGraphqlApp } from 'backend-helpers'
 |-----------------------|----------|------------
 | [options.loadMethods] | object   | Options passed to [backend-store](https://github.com/alekbarszczewski/backend-store) loadMethods plugin ( [available options](https://alekbarszczewski.github.io/backend-store/#/load-methods?id=options))
 | [options.logger]      | object   | Options passed to [backend-store](https://github.com/alekbarszczewski/backend-store) logger plugin ( [available options](https://alekbarszczewski.github.io/backend-store/#/logger?id=options))
-|
 | [options.methodContext] | object | All props of passed object will be assigned to every [backend-store](https://github.com/alekbarszczewski/backend-store) [MethodContext](https://alekbarszczewski.github.io/backend-store/#/store?id=method-context)
 |
 
@@ -37,6 +36,27 @@ This function is a helper that loads/initializes [backend-store](https://github.
 * If [options.methodContext] is passed then it will be assigned to each [MethodContext](https://alekbarszczewski.github.io/backend-store/#/store?id=method-context). It's useful to pass some helpers to backend-store methods instead of importing them.
 
 * It adds auth middleware to the store (described below)
+
+**Example**
+
+```js
+import { loadStore } from 'backend-helpers'
+import { join } from 'path'
+import { knex } from './db'
+
+const store = loadStore({
+  loadMethods: { path: join(__dirname, 'my-store') },
+  logger: {
+    customData () {
+      return { myCustomLogField: 123 }
+    }
+  },
+  methodContext: {
+    knex
+  }
+})
+```
+
 
 ### loadGraphql(path, [options]) => GraphqlSchema
 
