@@ -16,51 +16,7 @@ import { loadStore, loadGraphql, createGraphqlApp } from 'backend-helpers'
 
 ## Docs
 
-### loadStore([options]) => BackendStore
-
-| Argument              | Type     | Description
-|-----------------------|----------|------------
-| [options.loadMethods] | object   | Options passed to [backend-store](https://github.com/alekbarszczewski/backend-store) loadMethods plugin ( [available options](https://alekbarszczewski.github.io/backend-store/#/load-methods?id=options))
-| [options.logger]      | object   | Options passed to [backend-store](https://github.com/alekbarszczewski/backend-store) logger plugin ( [available options](https://alekbarszczewski.github.io/backend-store/#/logger?id=options))
-| [options.methodContext] | object | All props of passed object will be assigned to every [backend-store](https://github.com/alekbarszczewski/backend-store) [MethodContext](https://alekbarszczewski.github.io/backend-store/#/store?id=method-context)
-|
-
-This function is a helper that loads/initializes [backend-store](https://github.com/alekbarszczewski/backend-store).
-
-* If [options.loadMethods] is passed it automatically uses [loadMethods](https://alekbarszczewski.github.io/backend-store/#/load-store) plugin to load store from directory
-
-* It automatically uses [logger](https://alekbarszczewski.github.io/backend-store/#/logger) plugin additionally passing [options.logger] to it.
-  * Additionally it adds `user: context.user` to each log line
-  * Additionally it adds `pgErrDetails: { code, detail, constraint, column, table, schema }` to log line if Postgres error occured
-
-* If [options.methodContext] is passed then it will be assigned to each [MethodContext](https://alekbarszczewski.github.io/backend-store/#/store?id=method-context). It's useful to pass some helpers to backend-store methods instead of importing them.
-
-* It adds auth middleware to the store (described below)
-
-**Example**
-
-```js
-import { loadStore } from 'backend-helpers'
-import { join } from 'path'
-import { knex } from './db'
-
-const store = loadStore({
-  loadMethods: { path: join(__dirname, 'my-store') },
-  logger: {
-    customData () {
-      return { myCustomLogField: 123 }
-    }
-  },
-  methodContext: {
-    knex
-  }
-})
-```
-
-
-### loadGraphql(path, [options]) => GraphqlSchema
-
-### createGraphqlApp(graphqlSchema, [options]) => { app, graphqlHTTP }
+https://alekbarszczewski.github.io/backend-helpers
 
 # TODO
 
