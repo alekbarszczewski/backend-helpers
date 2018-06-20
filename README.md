@@ -1,6 +1,6 @@
 # backend-helpers
 
-Work in progress
+Some very opinionated helpers to set up graphql backend quickly and keep your code DRY.
 
 ## Install
 
@@ -20,7 +20,5 @@ https://alekbarszczewski.github.io/backend-helpers
 
 # TODO
 
-- docs
-- loadStore - logger options - test
 - validate args
 - example app
