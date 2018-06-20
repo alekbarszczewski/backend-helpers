@@ -3,10 +3,12 @@ const loadMethods = require('backend-store/plugins/loadMethods')
 const logger = require('backend-store/plugins/logger')
 const defaults = require('lodash.defaults')
 
-module.exports = function loadStore (path, options = {}) {
+module.exports = function loadStore (options = {}) {
   const store = new Store()
 
-  store.plugin(loadMethods, { path })
+  if (options.loadMethods) {
+    store.plugin(loadMethods, options.loadMethods)
+  }
 
   const loggerOptions = options.logger || {}
 

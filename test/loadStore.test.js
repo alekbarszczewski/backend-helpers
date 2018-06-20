@@ -13,7 +13,9 @@ const expect = chai.expect
 
 describe('loadStore', () => {
   it('load methods', async () => {
-    const store = loadStore(join(__dirname, 'testApp', 'store'))
+    const store = loadStore({
+      loadMethods: { path: join(__dirname, 'testApp', 'store') }
+    })
     const result = await store.dispatch('api/posts/create', {
       title: 'abc',
       content: '123'
@@ -32,7 +34,8 @@ describe('loadStore', () => {
       b: '123',
       cid: 'abc'
     }
-    const store = loadStore(join(__dirname, 'testApp', 'store'), {
+    const store = loadStore({
+      loadMethods: { path: join(__dirname, 'testApp', 'store') },
       methodContext
     })
 
@@ -65,7 +68,9 @@ describe('loadStore', () => {
 
   variants.forEach(variant => {
     it(`auth middleware ${variant}`, async () => {
-      const store = loadStore(join(__dirname, 'testApp', 'store'))
+      const store = loadStore({
+        loadMethods: { path: join(__dirname, 'testApp', 'store') }
+      })
       metas.forEach((meta, index) => {
         const methodAuth = variant === 'sync'
           ? meta.auth
@@ -104,7 +109,9 @@ describe('loadStore', () => {
   })
 
   it('auth middleware - auth fn with { payload, context, errors }', async () => {
-    const store = loadStore(join(__dirname, 'testApp', 'store'))
+    const store = loadStore({
+      loadMethods: { path: join(__dirname, 'testApp', 'store') }
+    })
     const spy = sinon.fake(() => false)
     store.define('m1', () => null, { auth: spy })
     const payload = {}
@@ -118,7 +125,9 @@ describe('loadStore', () => {
   })
 
   it('auth middleware - throw error from auth', async () => {
-    const store = loadStore(join(__dirname, 'testApp', 'store'))
+    const store = loadStore({
+      loadMethods: { path: join(__dirname, 'testApp', 'store') }
+    })
     store.define('m1', () => null, { auth: () => {
       throw new Error('test')
     } })
@@ -142,7 +151,8 @@ describe('loadStore', () => {
         return { a: 'b' }
       })
       const spy2 = sinon.spy()
-      const store = loadStore(join(__dirname, 'testApp', 'store'), {
+      const store = loadStore({
+        loadMethods: { path: join(__dirname, 'testApp', 'store') },
         logger: { customData: spy }
       })
       store.define('test', spy2)
@@ -196,7 +206,9 @@ describe('loadStore', () => {
     })
 
     it('add user to custom data', async () => {
-      const store = loadStore(join(__dirname, 'testApp', 'store'))
+      const store = loadStore({
+        loadMethods: { path: join(__dirname, 'testApp', 'store') }
+      })
       store.define('test', () => null)
       const getLines = captureLog()
       await store.dispatch('test', null, { user: { id: 1, role: 'admin' } })
@@ -207,7 +219,9 @@ describe('loadStore', () => {
     })
 
     it('add pgErrDetails to custom data', async () => {
-      const store = loadStore(join(__dirname, 'testApp', 'store'))
+      const store = loadStore({
+        loadMethods: { path: join(__dirname, 'testApp', 'store') }
+      })
       store.define('test', () => {
         const err = new Error('pg_error')
         err.code = 12345
