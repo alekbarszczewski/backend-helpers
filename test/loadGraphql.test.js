@@ -300,4 +300,10 @@ describe('loadGraphql', () => {
       reasons: null
     })
   })
+
+  it('throw error on invalid path argument', async () => {
+    expect(() => {
+      loadGraphql(false)
+    }).to.throw('Expected `false` to be of type `string` but received type `boolean`')
+  })
 })

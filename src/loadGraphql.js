@@ -4,8 +4,11 @@ const { makeExecutableSchema } = require('graphql-tools')
 const { errors } = require('backend-store')
 const { GraphQLDate, GraphQLTime, GraphQLDateTime } = require('graphql-iso-date')
 const GraphQLJSON = require('graphql-type-json')
+const ow = require('ow')
 
-module.exports = function loadGraphql (path, options = {}) {
+module.exports = function loadGraphql (path) {
+  ow(path, ow.string.nonEmpty.label(path))
+
   const { typeDefs, resolvers } = loadModules(path)
 
   typeDefs.push(getDefaultTypeDefs())

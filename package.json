@@ -27,7 +27,8 @@
     "graphql-schema-modules": "^0.0.3",
     "graphql-tools": "^3.0.2",
     "graphql-type-json": "^0.2.1",
-    "lodash.defaults": "^4.2.0"
+    "lodash.defaults": "^4.2.0",
+    "ow": "^0.6.0"
   },
   "devDependencies": {
     "capture-stdout": "^1.0.0",

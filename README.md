@@ -20,5 +20,11 @@ https://alekbarszczewski.github.io/backend-helpers
 
 # TODO
 
-- validate args
 - example app
+- cli
+- update docs
+- conventions
+- test createGraphqlApp - invaid schema arg
+- travis
+- code cov
+- badges

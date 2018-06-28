@@ -27,7 +27,7 @@ const store = loadStore({
 | Argument              | Type     | Description
 |-----------------------|----------|------------
 | [options.loadMethods] | object   | Options passed to [backend-store](https://github.com/alekbarszczewski/backend-store) loadMethods plugin ( [available options](https://alekbarszczewski.github.io/backend-store/#/load-methods?id=options))
-| [options.logger]      | object   | Options passed to [backend-store](https://github.com/alekbarszczewski/backend-store) logger plugin ( [available options](https://alekbarszczewski.github.io/backend-store/#/logger?id=options))
+| [options.logger]      | object or true   | Options passed to [backend-store](https://github.com/alekbarszczewski/backend-store) logger plugin ( [available options](https://alekbarszczewski.github.io/backend-store/#/logger?id=options))
 | [options.methodContext] | object | All props of passed object will be assigned to every [backend-store](https://github.com/alekbarszczewski/backend-store) [MethodContext](https://alekbarszczewski.github.io/backend-store/#/store?id=method-context)
 
 **options.loadMethods**
@@ -37,8 +37,6 @@ If this options is set then its value is passed to [backend-store](https://githu
 **options.logger**
 
 If this option is set its value is passed to [backend-store](https://github.com/alekbarszczewski/backend-store) logger plugin ( [available options](https://alekbarszczewski.github.io/backend-store/#/logger?id=options)).
-
-!> Even if options.logger is not passed logger plugin is still used on the store.
 
 !> loadStore also adds custom data field to each log line: `user: context.user`.
 

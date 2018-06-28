@@ -3,8 +3,11 @@ const cors = require('cors')
 const expressJwt = require('express-jwt')
 const graphqlHTTP = require('express-graphql')
 const { errors } = require('backend-store')
+const ow = require('ow')
 
 module.exports = function createGraphqlApp (graphqlSchema, options = {}) {
+  ow(options, ow.object.label('options'))
+
   const app = express()
 
   const graphql = graphqlHTTP({
@@ -12,19 +15,30 @@ module.exports = function createGraphqlApp (graphqlSchema, options = {}) {
     graphiql: false
   })
 
-  const corsMiddleware = cors({
-    methods: 'POST',
-    ...options.cors
-  })
+  let corsMiddleware
 
-  app.options('/', corsMiddleware)
+  if (options.cors) {
+    ow(options.cors, ow.any(ow.boolean, ow.object))
+    corsMiddleware = cors({
+      methods: 'POST',
+      ...options.cors
+    })
+    app.options('/', corsMiddleware)
+  }
 
-  app.use(expressJwt({
-    credentialsRequired: false,
-    ...options.jwt
-  }))
+  if (options.jwt) {
+    ow(options.jwt, ow.object.label('options.jwt'))
+    app.use(expressJwt({
+      credentialsRequired: false,
+      ...options.jwt
+    }))
+  }
 
-  app.post('/', corsMiddleware, graphql)
+  const handlers = [ graphql ]
+  if (corsMiddleware) {
+    handlers.unshift(corsMiddleware)
+  }
+  app.post('/', handlers)
 
   app.use((err, req, res, next) => {
     if (err.name === 'UnauthorizedError' && req.path === '/' && req.method.toLowerCase() === 'post') {

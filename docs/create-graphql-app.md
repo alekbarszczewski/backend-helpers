@@ -34,7 +34,7 @@ app.listen(5000)
 |-------------------|----------|------------
 | graphqlSchema     | string   | Graphql executable schema
 | [options.jwt]     | object   | Options passed to [express-jwt](https://github.com/auth0/express-jwt) middleware
-| [options.cors]    | object   | Options passed to [cors](https://github.com/expressjs/cors) middleware
+| [options.cors]    | object or true   | Options passed to [cors](https://github.com/expressjs/cors) middleware
 
 **return**
 

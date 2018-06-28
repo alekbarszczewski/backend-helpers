@@ -99,8 +99,59 @@ describe('createGraphqlApp', () => {
     })
   })
 
+  it('no CORS by default', async () => {
+    const { agent } = createApp({})
+    const { headers } = await agent
+      .options('/')
+    expect(headers['access-control-allow-origin']).to.equal(undefined)
+    expect(headers['access-control-allow-methods']).to.equal(undefined)
+  })
+
+  it('no JWT by default', async () => {
+    const { agent } = createApp({ jwt: false })
+    const { body } = await agent
+      .post('/')
+      .set('Authorization', getAuthHeader({ id: 2, role: 'admin' }))
+      .send({
+        query: `
+        query ($input: PostCreateInput!) {
+          Post {
+            create (input: $input) {
+              result {
+                post { id, title, content, userId }
+              }
+              error { type, severity, message, reasons { path, message } }
+            }
+          }
+        }
+      `,
+        variables: {
+          input: {
+            title: 'abc',
+            content: '123'
+          }
+        }
+      })
+
+    expect(body).to.eql({
+      'data': {
+        'Post': {
+          'create': {
+            'result': null,
+            'error': {
+              'type': 'authentication',
+              'severity': 'warning',
+              'message': 'You have to login first',
+              'reasons': null
+            }
+          }
+        }
+      }
+    })
+  })
+
   it('support cors #1', async () => {
-    const { agent } = createApp()
+    const { agent } = createApp({ cors: true })
     const { headers } = await agent
       .options('/')
     expect(headers['access-control-allow-origin']).to.equal('*')
@@ -280,12 +331,33 @@ describe('createGraphqlApp', () => {
       }
     })
   })
+
+  it('throw error on invalid options argument', async () => {
+    const schema = loadGraphql(join(__dirname, 'testApp', 'graphql'))
+    expect(() => {
+      createGraphqlApp(schema, null)
+    }).to.throw('Expected `options` to be of type `object` but received type `null`')
+  })
+
+  it('throw error on invalid options.cors', async () => {
+    const schema = loadGraphql(join(__dirname, 'testApp', 'graphql'))
+    expect(() => {
+      createGraphqlApp(schema, { cors: 'abc' })
+    }).to.throw('Any predicate failed with the following errors:\n- Expected argument to be of type `boolean` but received type `string`\n- Expected argument to be of type `object` but received type `string`')
+  })
+
+  it('throw error on invalid options.jwt', async () => {
+    const schema = loadGraphql(join(__dirname, 'testApp', 'graphql'))
+    expect(() => {
+      createGraphqlApp(schema, { jwt: 'abc' })
+    }).to.throw('Expected `options.jwt` to be of type `object` but received type `string`')
+  })
 })
 
 function createApp (options = {}) {
   const schema = loadGraphql(join(__dirname, 'testApp', 'graphql'))
   const { app, graphqlHTTP } = createGraphqlApp(schema, {
-    jwt: { secret: 'abc' },
+    jwt: options.jwt != null ? options.jwt : { secret: 'abc' },
     ...options
   })
   const agent = supertest.agent(app)

@@ -207,7 +207,8 @@ describe('loadStore', () => {
 
     it('add user to custom data', async () => {
       const store = loadStore({
-        loadMethods: { path: join(__dirname, 'testApp', 'store') }
+        loadMethods: { path: join(__dirname, 'testApp', 'store') },
+        logger: true
       })
       store.define('test', () => null)
       const getLines = captureLog()
@@ -218,9 +219,21 @@ describe('loadStore', () => {
       expect(lines[1].user).to.eql({ id: 1, role: 'admin' })
     })
 
-    it('add pgErrDetails to custom data', async () => {
+    it('dont load logger by default', async () => {
       const store = loadStore({
         loadMethods: { path: join(__dirname, 'testApp', 'store') }
+      })
+      store.define('test', () => null)
+      const getLines = captureLog()
+      await store.dispatch('test', null, { user: { id: 1, role: 'admin' } })
+      const lines = getLines()
+      expect(lines.length).to.equal(0)
+    })
+
+    it('add pgErrDetails to custom data', async () => {
+      const store = loadStore({
+        loadMethods: { path: join(__dirname, 'testApp', 'store') },
+        logger: true
       })
       store.define('test', () => {
         const err = new Error('pg_error')
@@ -246,6 +259,42 @@ describe('loadStore', () => {
         table: 'table'
       })
     })
+  })
+
+  it('pass true as options.logger', async () => {
+    expect(() => {
+      loadStore({ logger: true })
+    }).to.not.throw()
+  })
+
+  it('throw error on invalid options', async () => {
+    expect(() => {
+      loadStore(null)
+    }).to.throw('Expected `options` to be of type `object` but received type `null`')
+  })
+
+  it('throw error on invalid options.loadMethods', async () => {
+    expect(() => {
+      loadStore({ loadMethods: 'invalid' })
+    }).to.throw('Expected `options.loadMethods` to be of type `object` but received type `string`')
+  })
+
+  it('throw error on invalid options.logger', async () => {
+    expect(() => {
+      loadStore({ logger: 'invalid' })
+    }).to.throw('Any predicate failed with the following errors:\n- Expected argument to be of type `object` but received type `string`\n- Expected argument to be of type `boolean` but received type `string`')
+  })
+
+  it('throw error on invalid options.logger.customData', async () => {
+    expect(() => {
+      loadStore({ logger: { customData: 'abc' } })
+    }).to.throw('Expected `options.logger.customData` to be of type `Function` but received type `string`')
+  })
+
+  it('throw error on invalid options.methodContext', async () => {
+    expect(() => {
+      loadStore({ methodContext: 'abc' })
+    }).to.throw('Expected `options.methodContext` to be of type `object` but received type `string`')
   })
 })
 

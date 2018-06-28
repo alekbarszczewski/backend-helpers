@@ -2,40 +2,52 @@ const { Store } = require('backend-store')
 const loadMethods = require('backend-store/plugins/loadMethods')
 const logger = require('backend-store/plugins/logger')
 const defaults = require('lodash.defaults')
+const ow = require('ow')
 
 module.exports = function loadStore (options = {}) {
+  ow(options, ow.object.label('options'))
+
   const store = new Store()
 
   if (options.loadMethods) {
+    ow(options.loadMethods, ow.object.label('options.loadMethods'))
     store.plugin(loadMethods, options.loadMethods)
   }
 
-  const loggerOptions = options.logger || {}
+  const loggerOptions = options.logger
 
-  store.plugin(logger, {
-    ...loggerOptions,
-    customData (logContext) {
-      const userCustomData = loggerOptions.customData ? loggerOptions.customData(logContext) : null
-      const { context, err } = logContext
-      const customData = {
-        user: context && context.user ? context.user : null,
-        ...userCustomData
-      }
-      if (err) {
-        const pgError = err.code ? err : (err.err && err.err.code ? err.err : null)
-        if (pgError) {
-          const pgErrorFields = ['code', 'detail', 'constraint', 'column', 'table', 'schema']
-          customData.pgErrDetails = {}
-          pgErrorFields.forEach(key => {
-            customData.pgErrDetails[key] = pgError[key]
-          })
-        }
-      }
-      return customData
+  if (loggerOptions) {
+    ow(loggerOptions, ow.any(ow.object, ow.boolean))
+    if (loggerOptions.customData) {
+      ow(loggerOptions.customData, ow.function.label('options.logger.customData'))
     }
-  })
+
+    store.plugin(logger, {
+      ...loggerOptions,
+      customData (logContext) {
+        const userCustomData = loggerOptions.customData ? loggerOptions.customData(logContext) : null
+        const { context, err } = logContext
+        const customData = {
+          user: context && context.user ? context.user : null,
+          ...userCustomData
+        }
+        if (err) {
+          const pgError = err.code ? err : (err.err && err.err.code ? err.err : null)
+          if (pgError) {
+            const pgErrorFields = ['code', 'detail', 'constraint', 'column', 'table', 'schema']
+            customData.pgErrDetails = {}
+            pgErrorFields.forEach(key => {
+              customData.pgErrDetails[key] = pgError[key]
+            })
+          }
+        }
+        return customData
+      }
+    })
+  }
 
   if (options.methodContext) {
+    ow(options.methodContext, ow.object.label('options.methodContext'))
     store.use(function methodContext (payload, { methodContext }, next) {
       defaults(methodContext, options.methodContext)
       return next(payload)
