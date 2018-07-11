@@ -3,6 +3,7 @@
 const { join } = require('path')
 const chai = require('chai')
 const express = require('express')
+const Layer = require('express/lib/router/layer')
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 const { errors } = require('backend-store')
@@ -98,6 +99,96 @@ describe('createGraphqlApp', () => {
       }
     })
   })
+
+  it('work #3', async () => {
+    const { agent } = createApp()
+    const { body } = await agent
+      .post('/')
+      .set('Authorization', 'Bearer invalid_token')
+      .send({
+        query: `
+        query ($input: PostCreateInput!) {
+          Post {
+            create (input: $input) {
+              result {
+                post { id, title, content, userId }
+              }
+              error { type, severity, message, reasons { path, message } }
+            }
+          }
+        }
+      `,
+        variables: {
+          input: {
+            title: 'abc',
+            content: '123'
+          }
+        }
+      })
+
+    expect(body).to.eql({
+      'data': {
+        'Post': {
+          'create': {
+            'result': null,
+            'error': {
+              'type': 'authentication',
+              'severity': 'warning',
+              'message': 'jwt malformed',
+              'reasons': null
+            }
+          }
+        }
+      }
+    })
+  })
+
+  // it('work #4', async () => {
+  //   const { agent, app } = createApp()
+  //
+  //   unshiftMiddleware(app, '/', (req, res, next) => {
+  //     next(new Error('test'))
+  //   })
+  //
+  //   const { body } = await agent
+  //     .post('/')
+  //     .send({
+  //       query: `
+  //       query ($input: PostCreateInput!) {
+  //         Post {
+  //           create (input: $input) {
+  //             result {
+  //               post { id, title, content, userId }
+  //             }
+  //             error { type, severity, message, reasons { path, message } }
+  //           }
+  //         }
+  //       }
+  //     `,
+  //       variables: {
+  //         input: {
+  //           title: 'abc',
+  //           content: '123'
+  //         }
+  //       }
+  //     })
+  //
+  //   expect(body).to.eql({
+  //     'data': {
+  //       'Post': {
+  //         'create': {
+  //           'result': null,
+  //           'error': {
+  //             'type': 'authentication',
+  //             'severity': 'warning',
+  //             'message': 'jwt malformed',
+  //             'reasons': null
+  //           }
+  //         }
+  //       }
+  //     }
+  //   })
+  // })
 
   it('no CORS by default', async () => {
     const { agent } = createApp({})
@@ -368,3 +459,14 @@ function getAuthHeader (userData) {
   const token = jwt.sign(userData, 'abc')
   return `Bearer ${token}`
 }
+
+// function unshiftMiddleware (app, path, fn) {
+//   const router = app._router
+//   const layer = new Layer(path, {
+//     sensitive: this.caseSensitive,
+//     strict: false,
+//     end: false
+//   }, fn)
+//   layer.route = undefined;
+//   router.stack.unshift(layer)
+// }

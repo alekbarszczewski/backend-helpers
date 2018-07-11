@@ -28,3 +28,4 @@ https://alekbarszczewski.github.io/backend-helpers
 - travis
 - code cov
 - badges
+- tests for express graphql options

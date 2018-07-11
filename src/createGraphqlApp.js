@@ -8,11 +8,20 @@ const ow = require('ow')
 module.exports = function createGraphqlApp (graphqlSchema, options = {}) {
   ow(options, ow.object.label('options'))
 
+  const expressGraphqlOptions = options.expressGraphql || {}
+
   const app = express()
 
-  const graphql = graphqlHTTP({
-    schema: graphqlSchema,
-    graphiql: false
+  const graphql = graphqlHTTP(async (request, response, graphQLParams) => {
+    const requestOptions = typeof expressGraphqlOptions === 'function'
+      ? (await expressGraphqlOptions(request, response, graphQLParams))
+      : expressGraphqlOptions
+    return {
+      schema: graphqlSchema,
+      graphiql: false,
+      context: request,
+      ...requestOptions
+    }
   })
 
   let corsMiddleware

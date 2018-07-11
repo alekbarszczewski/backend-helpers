@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "STORE_LOG_LEVEL=fatal mocha ./test/*.test.js ./test/**/*.test.js && yarn lint",
+    "test": "STORE_LOG_LEVEL=fatal nyc mocha ./test/*.test.js ./test/**/*.test.js && yarn lint",
     "lint": "standard",
     "docs": "docsify serve ./docs",
     "prepublish": "yarn test"
@@ -27,6 +27,7 @@
     "graphql-schema-modules": "^0.0.3",
     "graphql-tools": "^3.0.2",
     "graphql-type-json": "^0.2.1",
+    "hb-emails": "^0.0.1",
     "lodash.defaults": "^4.2.0",
     "ow": "^0.6.0"
   },
@@ -38,6 +39,7 @@
     "graphql": "^0.13.2",
     "jsonwebtoken": "^8.3.0",
     "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
     "selectn": "^1.1.2",
     "sinon": "^6.0.0",
     "standard": "^11.0.1",
