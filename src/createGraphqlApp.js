@@ -56,7 +56,7 @@ module.exports = function createGraphqlApp (graphqlSchema, options = {}) {
       })
       graphql(req, res, next)
     } else {
-      next()
+      next(err)
     }
   })
 

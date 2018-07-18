@@ -7,6 +7,8 @@ const Layer = require('express/lib/router/layer')
 const supertest = require('supertest')
 const jwt = require('jsonwebtoken')
 const { errors } = require('backend-store')
+const sinon = require('sinon')
+const { addMiddleware } = require('graphql-add-middleware')
 const loadGraphql = require('./../src/loadGraphql')
 const createGraphqlApp = require('./../src/createGraphqlApp')
 
@@ -143,52 +145,118 @@ describe('createGraphqlApp', () => {
     })
   })
 
-  // it('work #4', async () => {
-  //   const { agent, app } = createApp()
-  //
-  //   unshiftMiddleware(app, '/', (req, res, next) => {
-  //     next(new Error('test'))
-  //   })
-  //
-  //   const { body } = await agent
-  //     .post('/')
-  //     .send({
-  //       query: `
-  //       query ($input: PostCreateInput!) {
-  //         Post {
-  //           create (input: $input) {
-  //             result {
-  //               post { id, title, content, userId }
-  //             }
-  //             error { type, severity, message, reasons { path, message } }
-  //           }
-  //         }
-  //       }
-  //     `,
-  //       variables: {
-  //         input: {
-  //           title: 'abc',
-  //           content: '123'
-  //         }
-  //       }
-  //     })
-  //
-  //   expect(body).to.eql({
-  //     'data': {
-  //       'Post': {
-  //         'create': {
-  //           'result': null,
-  //           'error': {
-  //             'type': 'authentication',
-  //             'severity': 'warning',
-  //             'message': 'jwt malformed',
-  //             'reasons': null
-  //           }
-  //         }
-  //       }
-  //     }
-  //   })
-  // })
+  it('work #4', async () => {
+    const { agent, app } = createApp()
+
+    unshiftMiddleware(app, '/', (req, res, next) => {
+      next(new Error('test'))
+    })
+
+    const { body, statusCode } = await agent
+      .post('/')
+      .send({
+        query: `
+        query ($input: PostCreateInput!) {
+          Post {
+            create (input: $input) {
+              result {
+                post { id, title, content, userId }
+              }
+              error { type, severity, message, reasons { path, message } }
+            }
+          }
+        }
+      `,
+        variables: {
+          input: {
+            title: 'abc',
+            content: '123'
+          }
+        }
+      })
+
+    expect(body).to.eql({})
+    expect(statusCode).to.equal(500)
+  })
+
+  it('support expressGraphql options', async () => {
+    const schema = loadGraphql(join(__dirname, 'testApp', 'graphql'))
+    const spy = sinon.spy()
+    addMiddleware(schema, (root, args, context, info, next) => {
+      spy(root)
+      return next()
+    })
+
+    const { app } = createGraphqlApp(schema, {
+      expressGraphql: {
+        rootValue: 'xxx'
+      }
+    })
+    const agent = supertest.agent(app)
+
+    await agent
+      .post('/')
+      .send({
+        query: `
+          query {
+            empty {
+              result
+            }
+          }
+        `
+      })
+
+    expect(spy.calledOnce).to.equal(true)
+    expect(spy.firstCall.args[0]).to.equal('xxx')
+  })
+
+  it('support expressGraphql options as function', async () => {
+    const schema = loadGraphql(join(__dirname, 'testApp', 'graphql'))
+    const { app } = createGraphqlApp(schema, {
+      async expressGraphql () {
+        return {
+          rootValue: 'xxx'
+        }
+      }
+    })
+    const agent = supertest.agent(app)
+    const spy = sinon.spy()
+    addMiddleware(schema, (root, args, context, info, next) => {
+      spy(root)
+      return next()
+    })
+    await agent
+      .post('/')
+      .send({
+        query: `
+          query {
+            empty {
+              result
+            }
+          }
+        `
+      })
+
+    expect(spy.calledOnce).to.equal(true)
+    expect(spy.firstCall.args[0]).to.equal('xxx')
+  })
+
+  it('create app without options', async () => {
+    const schema = loadGraphql(join(__dirname, 'testApp', 'graphql'))
+    const { app } = createGraphqlApp(schema)
+    const agent = supertest.agent(app)
+    const { body } = await agent
+      .post('/')
+      .send({
+        query: `
+          query {
+            empty {
+              result
+            }
+          }
+        `
+      })
+  })
 
   it('no CORS by default', async () => {
     const { agent } = createApp({})
@@ -460,13 +528,13 @@ function getAuthHeader (userData) {
   return `Bearer ${token}`
 }
 
-// function unshiftMiddleware (app, path, fn) {
-//   const router = app._router
-//   const layer = new Layer(path, {
-//     sensitive: this.caseSensitive,
-//     strict: false,
-//     end: false
-//   }, fn)
-//   layer.route = undefined;
-//   router.stack.unshift(layer)
-// }
+function unshiftMiddleware (app, path, fn) {
+  const router = app._router
+  const layer = new Layer(path, {
+    sensitive: this.caseSensitive,
+    strict: false,
+    end: false
+  }, fn)
+  layer.route = undefined
+  router.stack.unshift(layer)
+}

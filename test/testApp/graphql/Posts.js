@@ -36,6 +36,10 @@ module.exports.typeDefs = `
     time: Time!
   }
 
+  type Empty {
+    result: String
+  }
+
   type TestOutput {
     result: TestResult!
   }
@@ -43,6 +47,7 @@ module.exports.typeDefs = `
   type Query {
     Post: PostQuery
     test: TestOutput!
+    empty: Empty
   }
 `
 
@@ -58,6 +63,9 @@ module.exports.resolvers = {
         time: new Date(0),
         date: new Date(0)
       }
+    },
+    empty () {
+      return 'abc'
     }
   },
   PostQuery: {
