@@ -7,7 +7,10 @@ const ow = require('ow')
 module.exports = function loadStore (options = {}) {
   ow(options, ow.object.label('options'))
 
-  const store = new Store()
+  if (options.storeOptions) {
+    ow(options.storeOptions, ow.object.label('options.storeOptions'))
+  }
+  const store = new Store(options.storeOptions)
 
   if (options.loadMethods) {
     ow(options.loadMethods, ow.object.label('options.loadMethods'))

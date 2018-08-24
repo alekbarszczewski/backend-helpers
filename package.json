@@ -7,7 +7,7 @@
     "test": "STORE_LOG_LEVEL=fatal nyc mocha ./test/*.test.js ./test/**/*.test.js && yarn lint",
     "lint": "standard",
     "docs": "docsify serve ./docs",
-    "_prepublish": "yarn test"
+    "prepublish": "yarn test"
   },
   "repository": {
     "type": "git",

@@ -245,7 +245,7 @@ describe('createGraphqlApp', () => {
     const schema = loadGraphql(join(__dirname, 'testApp', 'graphql'))
     const { app } = createGraphqlApp(schema)
     const agent = supertest.agent(app)
-    const { body } = await agent
+    await agent
       .post('/')
       .send({
         query: `

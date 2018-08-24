@@ -28,6 +28,18 @@ describe('loadStore', () => {
     })
   })
 
+  it('pass storeOptions to Store constructor', async () => {
+    const defaultContext = {}
+    const store = loadStore({
+      storeOptions: {
+        getDefaultContext () {
+          return defaultContext
+        }
+      }
+    })
+    expect(store.getDefaultContext()).to.equal(defaultContext)
+  })
+
   it('methodContext', async () => {
     const methodContext = {
       a: {},
@@ -170,7 +182,7 @@ describe('loadStore', () => {
         err: undefined,
         source: 'auto',
         method: 'test',
-        context: undefined,
+        context: null,
         cid,
         seq: 0,
         meta: undefined,
@@ -190,7 +202,7 @@ describe('loadStore', () => {
         err: undefined,
         source: 'auto',
         method: 'test',
-        context: undefined,
+        context: null,
         cid,
         seq: 0,
         meta: undefined,

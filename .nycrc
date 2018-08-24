@@ -13,6 +13,6 @@
   "report-dir": "./coverage",
   "sourceMap": true,
   "instrument": true,
-  "check-coverage": true,
+  "check-coverage": false,
   "all": true
 }
