@@ -28,18 +28,6 @@ describe('loadStore', () => {
     })
   })
 
-  it('pass storeOptions to Store constructor', async () => {
-    const defaultContext = {}
-    const store = loadStore({
-      storeOptions: {
-        getDefaultContext () {
-          return defaultContext
-        }
-      }
-    })
-    expect(store.getDefaultContext()).to.equal(defaultContext)
-  })
-
   it('methodContext', async () => {
     const methodContext = {
       a: {},
