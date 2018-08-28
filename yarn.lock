@@ -579,9 +579,9 @@ babel-runtime@^6.22.0, babel-runtime@^6.26.0:
     core-js "^2.4.0"
     regenerator-runtime "^0.11.0"
 
-backend-store@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/backend-store/-/backend-store-0.5.0.tgz#c6fbd4b95aead5fdcda4a6dc46aed151ca79c854"
+backend-store@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/backend-store/-/backend-store-0.7.0.tgz#28f5b8d2cafe292b1b86e94fc94fb997316c02e4"
   dependencies:
     bunyan "^1.8.12"
     es6-error "^4.1.1"

@@ -17,7 +17,7 @@
     "node": ">= 8.x"
   },
   "dependencies": {
-    "backend-store": "^0.5.0",
+    "backend-store": "^0.7.0",
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "express-graphql": "^0.6.12",
